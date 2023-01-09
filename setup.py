@@ -31,7 +31,7 @@ setup(
         [console_scripts]
         percheron=percheron.cli:cli
     """,
-    install_requires=["click"],
+    install_requires=["click","GitPython", "requests", "requests-cache[all]","rich-click", "semver"],
     extras_require={
         "test": ["pytest"]
     },
