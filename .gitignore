@@ -10,3 +10,9 @@ venv
 
 # ignore local code cache
 codebase
+
+# ignore local api cache
+api_cache.sqlite
+
+# ignore local settings configuration
+.env
