@@ -72,7 +72,17 @@ def get(version, option):
     data = {"git_commits": git_commits, "git_trac_links": git_trac_links, "tickets": tickets, 
         "trac_tickets": trac_tickets, "trac_ticket_comments": trac_ticket_comments,  "pull_requests": pull_requests, "pr_comments": pr_comments, "thanks": thanks  }
 
+
+    header(f":floppy_disk: Saving parsed data to disk")
     results.save_to_json(data)
 
     print(rich.markdown.Markdown(f"# Data collected.\nYou can now start analysing the data."))
 
+@cli.command(name="data")
+@click.argument(
+    "data_source"
+)
+def data(data_source):
+    #TODO glasnt - ad-hoc analysis?
+    if data_source == "git_commits":
+        results.table_data(data_source)

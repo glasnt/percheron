@@ -92,6 +92,8 @@ def get_thanks(commits):
         if person in word_set:
             people.pop(i)
 
+    #TODO(glasnt): results come back with an empty string. 
+
     return people
 
 
