@@ -1,6 +1,7 @@
 import re
 import subprocess
 import sys
+from rich import print
 from datetime import datetime
 from pathlib import Path
 
@@ -85,16 +86,10 @@ def get_commits_in_range(start_tag, end_tag):
     pretty_commit(start_commit)
     print("Last commit:")
     pretty_commit(end_commit)
-    print("Number of commits:   ", len(commits))
-    commit_delta = datetime.fromtimestamp(
-        end_commit.authored_date
-    ) - datetime.fromtimestamp(start_commit.authored_date)
+    print(f"Number of commits: {len(commits)}")
+    commit_delta = datetime.fromtimestamp(end_commit.authored_date) - datetime.fromtimestamp(start_commit.authored_date)
     print(
-        "Time between commits:",
-        commit_delta.days,
-        "days",
-        "(" + str(round(commit_delta.days / 7 / 52 * 12)),
-        "months)",
+        f"Time between commits: {commit_delta.days} days ({str(round(commit_delta.days / 7 / 52 * 12))} months)"
     )
     return commits
 

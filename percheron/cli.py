@@ -1,7 +1,7 @@
 import rich_click as click
 import rich
 from rich import print
-from percheron.utils import git, trac, github, nlp, config
+from percheron.utils import git, trac, github, nlp, config, results
 
 def header(str): 
     """Print a formatted header"""
@@ -64,5 +64,15 @@ def get(version, option):
     print("Pull requests:", len(pull_requests))
     print("Pull Request Comments:", len(pr_comments))
 
-    header(f":spy: Parsing commit messages for Security thanks")
-    security_thanks = nlp.get_security_thanks(commits)
+    header(f":detective: Parsing commit messages for 'Thanks'")
+    nlp.install_nltk_data()
+    thanks = nlp.get_thanks(commits)
+    print(f"People thanked: {len(thanks)}")
+
+    data = {"git_commits": git_commits, "git_trac_links": git_trac_links, "tickets": tickets, 
+        "trac_tickets": trac_tickets, "trac_ticket_comments": trac_ticket_comments,  "pull_requests": pull_requests, "pr_comments": pr_comments, "thanks": thanks  }
+
+    results.save_to_json(data)
+
+    print(rich.markdown.Markdown(f"# Data collected.\nYou can now start analysing the data."))
+

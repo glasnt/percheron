@@ -113,11 +113,11 @@ def get_github_data(tickets):
 
     pr_comments = []
 
-    print("Getting commebts from those Pull Requests...")
+    print("Getting comments from those Pull Requests...")
     for request in tqdm(pull_requests):
         pr_comments += get_comments_from_pull_request(request["id"])
 
-
+    return pull_requests, pr_comments
 
 def rate_limit_context(): 
     GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", None)
