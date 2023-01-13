@@ -10,7 +10,7 @@ def session():
 
 
 def request_limit_reached(message, uri=None): 
-    print(f"A rate limit issue has occured: [bold]{message}[/bold].")
+    print(f"An issue has occured: [bold]{message}[/bold].")
     if "search" in uri:
         print("This issue occured using the GitHub Search API. This API has a notoriously slow API limit. Try again soon.")
     

@@ -17,3 +17,6 @@ api_cache.sqlite
 
 # ignore local settings configuration
 .env
+
+# ignore local reports
+percheron_*

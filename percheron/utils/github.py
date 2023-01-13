@@ -4,6 +4,7 @@ from datetime import datetime
 from pprint import pprint
 from tqdm import tqdm
 from percheron.utils import cache
+from percheron.utils.helpers import unique
 import os
 
 
@@ -19,6 +20,9 @@ def github_api(uri):
             "Accept": "application/vnd.github+json",
         },
     )
+
+    if resp.status_code == 404:
+        raise ValueError(resp.json()["message"])
 
     if resp.status_code != 200:
         message = resp.json()["message"]
@@ -149,4 +153,29 @@ def rate_limit_context():
         for limit_type in ["core", "search"]: 
             d = data[limit_type]
             reset = datetime.fromtimestamp(d["reset"])
-            print(f"GitHub {limit_type} API limit: {d['used']}/{d['limit']} resets at {reset} ({reset.seconds} seconds)")
+            print(f"GitHub {limit_type} API limit: {d['used']}/{d['limit']} resets at {reset} ({reset.second} seconds)")
+
+
+
+def get_github_user(user):
+    """For a GitHub username, get their name.
+    NOTE(glasnt): debugging details have been added here to work out source of 
+    missing data, rather than trying to use None or N/A, etc. 
+    """
+    try:
+        data = github_api(f"/users/{user}")
+    except ValueError:
+        return user + " [not found on GitHub]"
+    if data["name"] == None:
+        return user + " [no GitHub name]"
+    return data["name"]
+
+def get_github_users(users):
+    """For a list of users, get their GitHub name"""
+    github_name = {}
+    for user in tqdm(unique(users)):
+        github_name[user] = get_github_user(user)
+    
+    # Also return the reverse dict
+    return github_name
+

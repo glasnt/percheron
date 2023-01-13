@@ -1,7 +1,7 @@
 import rich_click as click
 import rich
 from rich import print
-from percheron.utils import git, trac, github, nlp, config, results
+from percheron.utils import git, trac, github, nlp, config, results, helpers
 
 def header(str): 
     """Print a formatted header"""
@@ -35,7 +35,7 @@ def get(version, option):
     print(rich.markdown.Markdown(f"# percheron processing Django {version}"))
 
     header(":down_arrow: Download django codebase")
-    git.get_github_repo()
+    git.get_django_repo()
 
     header(":thought_balloon: Determine range of calculations")
     prev_version = git.get_previous_version(version)
@@ -52,12 +52,10 @@ def get(version, option):
     print("Git Trac Links:", len(git_trac_links))
     print("Tickets:", len(tickets))
 
-
     header(f":railway_track: Getting data from Trac")
     trac_tickets, trac_ticket_comments = trac.get_trac_tickets(tickets)
     print("Trac Tickets:", len(trac_tickets))
     print("Trac Ticket Comments:", len(trac_ticket_comments))
-
 
     header(f":octopus: Getting data from github")
     pull_requests, pr_comments = github.get_github_data(tickets)
@@ -69,20 +67,25 @@ def get(version, option):
     thanks = nlp.get_thanks(commits)
     print(f"People thanked: {len(thanks)}")
 
-    data = {"git_commits": git_commits, "git_trac_links": git_trac_links, "tickets": tickets, 
-        "trac_tickets": trac_tickets, "trac_ticket_comments": trac_ticket_comments,  "pull_requests": pull_requests, "pr_comments": pr_comments, "thanks": thanks  }
+    header(f":currency_exchange: Download django translations codebase")
+    git.get_translations_repo(version=version)
+    translators = git.get_translators(version)
+    print("Translators:", len(translators))
+
+    header(f":name_badge: Get all github users")
+    github_name = github.get_github_users([u["user"] for u in pull_requests] + [u["user"] for u in pr_comments] + [u["reporter"] for u in trac_tickets ] +[u["name"] for u in trac_ticket_comments])
+    # Code golf :D
+    github_user = {v: k for k, v in github_name.items()}
+    #github_user, github_data = helpers.convert_lookup_to_data(github_name)
+    print("Users:", len(github_name))
+
+    header(f":bar_chart: Generate report")
+    results.generate_report(version, git_commits, pull_requests, pr_comments, trac_tickets, trac_ticket_comments, thanks, translators, github_user, github_name)
 
 
-    header(f":floppy_disk: Saving parsed data to disk")
-    results.save_to_json(data)
+    header(f":floppy_disk: Saving data to disk")
+    all_data = [git_commits, git_trac_links, trac_tickets, trac_ticket_comments, pull_requests, pr_comments, thanks, translators]#, github_data]
+    
+    results.save_to_disk(all_data)
 
-    print(rich.markdown.Markdown(f"# Data collected.\nYou can now start analysing the data."))
-
-@cli.command(name="data")
-@click.argument(
-    "data_source"
-)
-def data(data_source):
-    #TODO glasnt - ad-hoc analysis?
-    if data_source == "git_commits":
-        results.table_data(data_source)
+    print(rich.markdown.Markdown(f"# Data collected.\n\nYou can now start analysing the data with Datasette: \n\n```datasette {results.OUTPUT_DB}```"))

@@ -4,15 +4,14 @@ import sys
 from rich import print
 from datetime import datetime
 from pathlib import Path
-
+from percheron.utils.helpers import unique
 import git
 
-CODEBASE_FOLDER = "codebase"
-
-
-def get_repo():
-    """Get a pythonic represenatation of the repo"""
-    return git.Repo(CODEBASE_FOLDER)
+CODEBASE_FOLDER = "codebase/"
+DJANGO_PROJECT = "django"
+TRANSLATIONS_PROJECT = "django-docs-translations"
+DJANGO_REPO = Path(CODEBASE_FOLDER) / DJANGO_PROJECT
+TRANSLATIONS_REPO =  Path( CODEBASE_FOLDER ) / TRANSLATIONS_PROJECT
 
 
 def run_command(cmd):
@@ -22,19 +21,30 @@ def run_command(cmd):
         sys.stdout.buffer.write(c)
 
 
-def get_github_repo():
-    """Pull a copy of the git repo to local disk, if it doesn't already exist."""
-    if Path(CODEBASE_FOLDER).exists():
+def get_django_repo(): 
+    get_github_repo(codebase=DJANGO_PROJECT, clone_fn=DJANGO_REPO)
+
+
+def get_translations_repo(version): 
+    get_github_repo(codebase=TRANSLATIONS_PROJECT, clone_fn=TRANSLATIONS_REPO, branch=f"stable/{version}.x")
+
+
+def get_github_repo(codebase, clone_fn,  branch=None):
+    """Pull a copy of the git repo to local disk, if it doesn't already exist.
+    Optionally only clone a specific branch in question (saves time/diskspace)"""
+
+    if Path(clone_fn).exists():
         print(
-            f"Codebase already cloned. To re-clone, delete the folder '{CODEBASE_FOLDER}'."
+            f"Codebase already cloned. To re-clone, delete the folder '{clone_fn}'."
         )
     else:
-        run_command(f"git clone https://github.com/django/django {CODEBASE_FOLDER}")
+        branch_filter = f"-b {branch}" if branch else ""
+        run_command(f"git clone {branch_filter} https://github.com/django/{codebase} {str(clone_fn)}")
 
 
 def get_previous_version(version):
     """For a version of Django, get the previous version"""
-    tags = [str(t) for t in get_repo().tags]
+    tags = [str(t) for t in git.Repo(DJANGO_REPO).tags]
 
     # Scope: most comparisons will be Django releases, which use MAJOR.MINOR, which strictly isn't semver
     # So, we make our own logic.
@@ -59,13 +69,13 @@ def get_previous_version(version):
 
 def tag_valid(tag):
     """Return true if the tag is a valid tag in the codebase"""
-    return tag in get_repo().tags
+    return tag in git.Repo(DJANGO_REPO).tags
 
 
 def get_commits_in_range(start_tag, end_tag):
     """For two tags, get the commits in the range.
     Uses logic from https://noumenal.es/posts/what-is-django-4/zj2/"""
-    repo = get_repo()
+    repo = git.Repo(DJANGO_REPO)
 
     start_commit = repo.commit(start_tag)
     end_commit = repo.commit(end_tag)
@@ -129,3 +139,35 @@ def get_git_commits(commits):
     tickets = list(set([k["trac_ticket_id"] for k in git_trac_links]))
 
     return git_commits, git_trac_links, tickets
+
+
+
+def get_translators(version): 
+    """Get translators for version of Django
+    
+    NOTE: the logic within here is based on the limitation that we 
+    parse the translation file headers for committers for the current year
+
+    If functionality within Transifex is found, this can be used instead.
+    """
+    translations = TRANSLATIONS_REPO
+
+    # Using the version as a tag, get the current year for the Django (not translations) repo
+    last_commit = git.Repo(DJANGO_REPO).commit(version)
+    year = datetime.fromtimestamp(last_commit.committed_date).year
+
+    # Check all the translations headers for people from the year
+    translators = []
+
+    for file in translations.glob("**/*.po"):
+        with open(file) as f: 
+            for line in f.readlines():
+                if re.search(f"^#(.*){year}", line):
+                    translators.append(line.split(",")[0])
+
+    # cleanup data
+    for i, author in enumerate(translators):
+        translators[i] = author.replace("#","").strip().split("<")[0]
+                    
+    translators = unique(translators)
+    return translators

@@ -39,7 +39,9 @@ setup(
         "rich-click",
         "tqdm",
         "nltk",
-        "python-dotenv"
+        "python-dotenv",
+        "datasette",
+        "sqlite-utils"
     ],
     extras_require={"test": ["pytest"]},
     python_requires=">=3.7",

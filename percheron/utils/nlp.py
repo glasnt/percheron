@@ -3,14 +3,7 @@ import nltk
 from tqdm import tqdm
 from nltk.tree import Tree
 import re
-
-def flatten(l): 
-    return [item for sublist in l for item in sublist]
-
-def unique(l): 
-    l = list(filter(lambda i: i is not None, l))
-    l = [a.strip() for a in l]
-    return sorted(list(set(l)), key=str.casefold)
+from percheron.utils.helpers import flatten, unique
 
 def get_people(text): 
     """For a string of text, return people."""
