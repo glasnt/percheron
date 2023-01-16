@@ -63,12 +63,11 @@ The following is the relational mapping, some fields removed for clarity.
 
 `data/`: 
   * JSON files of the different data sources.
+  * `percheron_data.db` - an SQLite database of all the data above, for use with tools like [Datasette](https://datasette.io/)
 
 `reports/` 
-
- * `percheron_list.txt` - A flat list of contributors.
- * `percheron_report.{txt,csv}` - A {ascii table, csv} report of all contributors, per contribution type. 
- * `percheron_data.db` - an SQLite database of all the data above, for use with tools like [Datasette](https://datasette.io/)
+  * `percheron_list.txt` - A flat list of contributors.
+  * `percheron_report.{txt,csv}` - A {ascii table, csv} report of all contributors, per contribution type. 
 
 
 ## Known limitations
