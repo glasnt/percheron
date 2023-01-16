@@ -175,6 +175,9 @@ def get_translators(version):
         people[i] = author.replace("#", "").strip().split("<")[0]
 
     people = unique(people)
+
+    # save translators to file
     translators = [{"name": name} for name in people]
     results.save_to_disk(translators)
+
     return people
