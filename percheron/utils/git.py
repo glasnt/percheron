@@ -167,7 +167,7 @@ def get_translators(version):
     for file in translations.glob("**/*.po"):
         with open(file) as f:
             for line in f.readlines():
-                if re.search(f"^#(.*){year}", line):
+                if re.search(f"^#(.*), (.*){year}(.*)", line):
                     people.append(line.split(",")[0])
 
     # cleanup data
