@@ -1,15 +1,21 @@
 from setuptools import setup
-import os
+from textwrap import dedent
 
-VERSION = "0.0.2"
+VERSION = "0.0.3"
 
 
 def get_long_description():
-    with open(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "README_pypi.md"),
-        encoding="utf8",
-    ) as fp:
-        return fp.read()
+    return dedent("""
+        # percheron
+
+        Percheron is a data collation tool specifically designed to gather and collate the contributors for a release of the [Django](https://djangoproject.com) project. 
+
+        It gathers data from a number of sources, including the commits to the Django project itself, issue tracking, pull requests, and translations. 
+
+        For more information, read the [methodology](https://github.com/glasnt/percheron/tree/main/docs).
+
+        For usage information, see the [GitHub README](https://github.com/glasnt/percheron)
+    """)
 
 
 setup(
