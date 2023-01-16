@@ -1,7 +1,7 @@
 from setuptools import setup
 import os
 
-VERSION = "0.1"
+VERSION = "0.0.1"
 
 
 def get_long_description():
@@ -41,7 +41,7 @@ setup(
         "nltk",
         "python-dotenv",
         "datasette",
-        "sqlite-utils"
+        "sqlite-utils",
     ],
     extras_require={"test": ["pytest"]},
     python_requires=">=3.7",
