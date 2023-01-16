@@ -5,13 +5,9 @@ from rich import print
 from datetime import datetime
 from pathlib import Path
 from percheron.utils.helpers import unique
+from percheron.utils import results
+from percheron import config
 import git
-
-CACHE_FOLDER = "cache/"
-DJANGO_PROJECT = "django"
-TRANSLATIONS_PROJECT = "django-docs-translations"
-DJANGO_REPO = Path(CACHE_FOLDER) / DJANGO_PROJECT
-TRANSLATIONS_REPO = Path(CACHE_FOLDER) / TRANSLATIONS_PROJECT
 
 
 def run_command(cmd):
@@ -22,13 +18,13 @@ def run_command(cmd):
 
 
 def get_django_repo():
-    get_github_repo(codebase=DJANGO_PROJECT, clone_fn=DJANGO_REPO)
+    get_github_repo(codebase=config.DJANGO_PROJECT, clone_fn=config.DJANGO_REPO)
 
 
 def get_translations_repo(version):
     get_github_repo(
-        codebase=TRANSLATIONS_PROJECT,
-        clone_fn=TRANSLATIONS_REPO,
+        codebase=config.TRANSLATIONS_PROJECT,
+        clone_fn=config.TRANSLATIONS_REPO,
         branch=f"stable/{version}.x",
     )
 
@@ -48,7 +44,7 @@ def get_github_repo(codebase, clone_fn, branch=None):
 
 def get_previous_version(version):
     """For a version of Django, get the previous version"""
-    tags = [str(t) for t in git.Repo(DJANGO_REPO).tags]
+    tags = [str(t) for t in git.Repo(config.DJANGO_REPO).tags]
 
     # Scope: most comparisons will be Django releases, which use MAJOR.MINOR, which strictly isn't semver
     # So, we make our own logic.
@@ -73,13 +69,13 @@ def get_previous_version(version):
 
 def tag_valid(tag):
     """Return true if the tag is a valid tag in the codebase"""
-    return tag in git.Repo(DJANGO_REPO).tags
+    return tag in git.Repo(config.DJANGO_REPO).tags
 
 
 def get_commits_in_range(start_tag, end_tag):
     """For two tags, get the commits in the range.
     Uses logic from https://noumenal.es/posts/what-is-django-4/zj2/"""
-    repo = git.Repo(DJANGO_REPO)
+    repo = git.Repo(config.DJANGO_REPO)
 
     start_commit = repo.commit(start_tag)
     end_commit = repo.commit(end_tag)
@@ -144,6 +140,10 @@ def get_git_commits(commits):
     # Get unique list
     tickets = list(set([k["trac_ticket_id"] for k in git_trac_links]))
 
+    results.save_to_disk(git_commits)
+    results.save_to_disk(git_trac_links)
+    
+
     return git_commits, git_trac_links, tickets
 
 
@@ -155,24 +155,26 @@ def get_translators(version):
 
     If functionality within Transifex is found, this can be used instead.
     """
-    translations = TRANSLATIONS_REPO
+    translations = config.TRANSLATIONS_REPO
 
     # Using the version as a tag, get the current year for the Django (not translations) repo
-    last_commit = git.Repo(DJANGO_REPO).commit(version)
+    last_commit = git.Repo(config.DJANGO_REPO).commit(version)
     year = datetime.fromtimestamp(last_commit.committed_date).year
 
     # Check all the translations headers for people from the year
-    translators = []
+    people = []
 
     for file in translations.glob("**/*.po"):
         with open(file) as f:
             for line in f.readlines():
                 if re.search(f"^#(.*){year}", line):
-                    translators.append(line.split(",")[0])
+                    people.append(line.split(",")[0])
 
     # cleanup data
-    for i, author in enumerate(translators):
-        translators[i] = author.replace("#", "").strip().split("<")[0]
+    for i, author in enumerate(people):
+        people[i] = author.replace("#", "").strip().split("<")[0]
 
-    translators = unique(translators)
-    return translators
+    people = unique(people)
+    translators = [{"name": name} for name in people]
+    results.save_to_disk(translators)
+    return people

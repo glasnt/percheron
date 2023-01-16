@@ -1,7 +1,8 @@
 import rich_click as click
 import rich
 from rich import print
-from percheron.utils import git, trac, github, nlp, config, results, helpers
+from percheron.utils import git, reports, trac, github, nlp, results
+from percheron import config
 
 
 def header(str):
@@ -34,6 +35,8 @@ def get(version, option):
         click.Context.exit(1)
 
     print(rich.markdown.Markdown(f"# percheron processing Django {version}"))
+
+    results.datasette_init()
 
     header(":down_arrow: Download django codebase")
     git.get_django_repo()
@@ -87,7 +90,7 @@ def get(version, option):
     print("Users:", len(github_name))
 
     header(f":bar_chart: Generate report")
-    results.generate_report(
+    reports.generate_report(
         version,
         git_commits,
         pull_requests,
@@ -100,22 +103,12 @@ def get(version, option):
         github_name,
     )
 
-    header(f":floppy_disk: Saving data to disk")
-    all_data = [
-        git_commits,
-        git_trac_links,
-        trac_tickets,
-        trac_ticket_comments,
-        pull_requests,
-        pr_comments,
-        thanks,
-        translators,
-    ]  # , github_data]
-
-    results.save_to_disk(all_data)
-
     print(
         rich.markdown.Markdown(
-            f"# Data collected.\n\nYou can now start analysing the data with Datasette: \n\n```datasette {results.OUTPUT_DB}```"
+            f"# Data collected.\n\nYou can now start analysing the data with Datasette: percheron datasette"
         )
     )
+
+@cli.command(name="datasette")
+def datasette(): 
+    print(f"To launch datasette: datasette {results.OUTPUT_DB}")

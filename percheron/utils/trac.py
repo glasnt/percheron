@@ -1,9 +1,7 @@
 import json
 from tqdm import tqdm
-from percheron.utils import cache
-
-
-DJANGO_TRAC = "https://code.djangoproject.com/jsonrpc"
+from percheron.utils import cache, results
+from percheron import config
 
 
 def get_trac_details(ticket_no):
@@ -14,7 +12,7 @@ def get_trac_details(ticket_no):
 
     # Shout out to rixx https://gist.github.com/rixx/422392d2aa580b5d286e585418bf6915
     resp = session.post(
-        DJANGO_TRAC,
+        config.DJANGO_TRAC,
         data=json.dumps(
             {"method": "ticket.get", "id": ticket_no, "params": [ticket_no]}
         ),
@@ -35,7 +33,7 @@ def get_trac_details(ticket_no):
     # Return the changelog as a list of tuples of the form
     # (time, author, field, oldvalue, newvalue, permanent).
     response = session.post(
-        DJANGO_TRAC,
+        config.DJANGO_TRAC,
         data=json.dumps(
             {"method": "ticket.changeLog", "id": ticket_no, "params": [ticket_no]}
         ),
@@ -70,5 +68,8 @@ def get_trac_tickets(tickets):
         ticket, ticket_comments = get_trac_details(ticket_no)
         trac_tickets.append(ticket)
         trac_ticket_comments += ticket_comments
+
+    results.save_to_disk(trac_tickets)
+    results.save_to_disk(trac_ticket_comments)
 
     return trac_tickets, trac_ticket_comments

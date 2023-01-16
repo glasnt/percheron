@@ -4,6 +4,7 @@ from tqdm import tqdm
 from nltk.tree import Tree
 import re
 from percheron.utils.helpers import flatten, unique
+from percheron.utils import results
 
 
 def get_people(text):
@@ -90,14 +91,15 @@ def get_thanks(commits):
         "Switched",
     ]
 
-    people = unique(people)
     for i, person in enumerate(people):
         # Trim out word set
         people[i] = person.replace("Thanks ", "")
         if person in word_set:
             people.pop(i)
+    people = unique(people)
 
-    # TODO(glasnt): results come back with an empty string.
+    thanks = [{"name": name} for name in people]
+    results.save_to_disk(thanks)
 
     return people
 

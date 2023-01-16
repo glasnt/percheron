@@ -1,22 +1,20 @@
 import time
 
 from datetime import datetime
-from pprint import pprint
 from tqdm import tqdm
-from percheron.utils import cache
+from percheron.utils import cache, results
 from percheron.utils.helpers import unique
-import os
+from percheron import config
 
 
 def github_api(uri):
-    GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", None)
     """For a GitHub API path, return the JSON data"""
 
     session = cache.session()
     resp = session.get(
         "https://api.github.com" + uri,
         headers={
-            "Authorization": f"Bearer {GITHUB_TOKEN}",
+            "Authorization": f"Bearer {config.GITHUB_TOKEN}",
             "Accept": "application/vnd.github+json",
         },
     )
@@ -104,10 +102,16 @@ def get_github_data(tickets):
 
     pull_request_ids = []
     pull_requests = []
+    trac_pr_links = []
 
     print("Getting Pull Requests that are mentioned in tickets...")
     for ticket_no in tqdm(tickets):
-        pull_request_ids += search_for_pull_requests(ticket_no)
+        prs_for_ticket = search_for_pull_requests(ticket_no)
+
+        for pr in prs_for_ticket:
+            trac_pr_links.append({"ticket_id": ticket_no, "pull_request": str(pr)})
+        
+        pull_request_ids += prs_for_ticket
 
     pull_request_ids = list(set(pull_request_ids))
 
@@ -121,11 +125,14 @@ def get_github_data(tickets):
     for request in tqdm(pull_requests):
         pr_comments += get_comments_from_pull_request(request["id"])
 
+    results.save_to_disk(pull_requests)
+    results.save_to_disk(pr_comments)
+    results.save_to_disk(trac_pr_links)
+
     return pull_requests, pr_comments
 
 
 def rate_limit_context():
-    GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", None)
     """For a GitHub API path, return the JSON data"""
 
     session = cache.session()
@@ -134,7 +141,7 @@ def rate_limit_context():
         resp = session.get(
             "https://api.github.com/rate_limit",
             headers={
-                "Authorization": f"Bearer {GITHUB_TOKEN}",
+                "Authorization": f"Bearer {config.GITHUB_TOKEN}",
                 "Accept": "application/vnd.github.v3.raw",
             },
         )
@@ -142,7 +149,6 @@ def rate_limit_context():
         print(resp.json())
     else:
         data = resp.json()["resources"]
-        now = datetime.now()
 
         if (
             "X-RateLimit-Remaining" in resp.headers
@@ -177,8 +183,13 @@ def get_github_user(user):
 def get_github_users(users):
     """For a list of users, get their GitHub name"""
     github_name = {}
+    github_userdata = []
     for user in tqdm(unique(users)):
-        github_name[user] = get_github_user(user)
+        name = get_github_user(user)
 
-    # Also return the reverse dict
+        github_name[user] = name
+        github_userdata.append({"name": name, "username": user })
+
+    results.save_to_disk(github_userdata)
+
     return github_name
