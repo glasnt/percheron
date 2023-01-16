@@ -10,10 +10,11 @@ from sqlite_utils import Database
 
 from percheron.utils.helpers import retrieve_name, unique
 
-RESULTS_FOLDER = "data"
-OUTPUT_DB = "percheron_data.db"
-OUTPUT_REPORT = "percheron_report.txt"
-OUTPUT_LIST = "percheron_list.txt"
+DATA_FOLDER = "data"
+REPORT_FOLDER = "reports"
+OUTPUT_DB = Path(REPORT_FOLDER) / "percheron_data.db"
+OUTPUT_REPORT = Path(REPORT_FOLDER) / "percheron_report.txt"
+OUTPUT_LIST = Path(REPORT_FOLDER) / "percheron_list.txt"
 
 def print_table(table_name="Table", columns=["a", "b"], data=[[1,2],[3,4]], limit=None):
     table = Table(title=table_name)
@@ -35,13 +36,13 @@ def table_data(data_source):
 
 
 def load_from_json(data_fn):
-    json_fn = f"{RESULTS_FOLDER}/{data_fn}.json"
+    json_fn = f"{DATA_FOLDER}/{data_fn}.json"
     with open(json_fn) as f:
         data = json.load(f)
     return data
 
 def save_to_disk(data_sets):
-    Path(RESULTS_FOLDER).mkdir(parents=True, exist_ok=True)
+    Path(DATA_FOLDER).mkdir(parents=True, exist_ok=True)
 
     db = Database(OUTPUT_DB, recreate=True)
 
@@ -49,7 +50,7 @@ def save_to_disk(data_sets):
         # Sorry
         fn = retrieve_name(data)
 
-        json_fn = f"{RESULTS_FOLDER}/{fn}.json"
+        json_fn = f"{DATA_FOLDER}/{fn}.json"
         with open(json_fn, "w") as f:
             f.write(json.dumps(data, indent=2))
             print(f"Wrote data to {json_fn}")
@@ -62,6 +63,8 @@ def save_to_disk(data_sets):
 
 
 def generate_report(version, git_commits, pull_requests, pr_comments, trac_tickets, trac_ticket_comments, thanks, translators, github_user, github_name):
+    Path(REPORT_FOLDER).mkdir(parents=True, exist_ok=True)
+    
     contrib_array = {"g": 0, "pr": 0, "prc": 0, "ttr": 0, "ttc": 0, "st": 0, "tt": 0}
 
     contributors = {}

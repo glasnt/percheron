@@ -7,11 +7,11 @@ from pathlib import Path
 from percheron.utils.helpers import unique
 import git
 
-CODEBASE_FOLDER = "codebase/"
+CACHE_FOLDER = "cache/"
 DJANGO_PROJECT = "django"
 TRANSLATIONS_PROJECT = "django-docs-translations"
-DJANGO_REPO = Path(CODEBASE_FOLDER) / DJANGO_PROJECT
-TRANSLATIONS_REPO =  Path( CODEBASE_FOLDER ) / TRANSLATIONS_PROJECT
+DJANGO_REPO = Path(CACHE_FOLDER) / DJANGO_PROJECT
+TRANSLATIONS_REPO =  Path(CACHE_FOLDER) / TRANSLATIONS_PROJECT
 
 
 def run_command(cmd):

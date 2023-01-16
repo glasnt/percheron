@@ -6,7 +6,7 @@ from rich import print
 
 def session(): 
     # Note: POST may be ignored by default! So ensure we cache that. 
-    return CachedSession('api_cache', backend='sqlite', allowable_methods=('GET', 'POST'))
+    return CachedSession('cache/api_cache', backend='sqlite', allowable_methods=('GET', 'POST'))
 
 
 def request_limit_reached(message, uri=None): 
