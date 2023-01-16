@@ -110,6 +110,7 @@ def get(version, option):
         )
     )
 
+
 @cli.command(name="datasette")
-def datasette(): 
+def datasette():
     print(f"To launch datasette: datasette {results.OUTPUT_DB}")

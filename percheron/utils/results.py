@@ -1,4 +1,3 @@
-
 import json
 from pathlib import Path
 
@@ -9,7 +8,8 @@ from percheron.utils.helpers import retrieve_name
 
 OUTPUT_DB = Path(config.DATA_FOLDER) / "percheron_data.db"
 
-def datasette_init(): 
+
+def datasette_init():
     """Initialise the datasette database"""
     Path(config.DATA_FOLDER).mkdir(parents=True, exist_ok=True)
     Database(OUTPUT_DB, recreate=True)
@@ -18,7 +18,7 @@ def datasette_init():
 def save_to_disk(data):
     """For a list of dictionaries, save the results to a JSON file, and append to datasette"""
 
-    fn = retrieve_name(data)    # Sorry
+    fn = retrieve_name(data)  # Sorry
 
     json_fn = f"{config.DATA_FOLDER}/{fn}.json"
     with open(json_fn, "w") as f:

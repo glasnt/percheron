@@ -111,7 +111,7 @@ def get_github_data(tickets):
 
         for pr in prs_for_ticket:
             trac_pr_links.append({"ticket_id": ticket_no, "pull_request": str(pr)})
-        
+
         pull_request_ids += prs_for_ticket
 
     pull_request_ids = list(set(pull_request_ids))
@@ -191,7 +191,7 @@ def get_github_users(users):
         name = get_github_user(user)
 
         github_name[user] = name
-        github_userdata.append({"name": name, "username": user })
+        github_userdata.append({"name": name, "username": user})
 
     results.save_to_disk(github_userdata)
 

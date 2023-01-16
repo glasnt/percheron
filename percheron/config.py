@@ -10,7 +10,6 @@ REPORT_FOLDER = "reports"
 DATA_FOLDER = "data"
 
 
-
 DJANGO_TRAC = "https://code.djangoproject.com/jsonrpc"
 DJANGO_PROJECT = "django"
 TRANSLATIONS_PROJECT = "django-docs-translations"
@@ -20,6 +19,7 @@ TRANSLATIONS_REPO = Path(CACHE_FOLDER) / TRANSLATIONS_PROJECT
 
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", None)
+
 
 def validate_configuration():
     """Confirm settings before things start."""

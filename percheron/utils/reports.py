@@ -131,7 +131,6 @@ def generate_report(
         console.print(table)
         console.rule(f"Report Generated {datetime.now().ctime()}")
 
-
     # Generate a displayable name for the list report
     django_contributors = []
     for c in unique(contributors.keys()):
@@ -141,7 +140,7 @@ def generate_report(
         else:
             display_name = c
         django_contributors.append(display_name)
-    
+
     django_contributors = unique(django_contributors)
 
     with open(OUTPUT_LIST, "w") as f:

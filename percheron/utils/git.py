@@ -144,7 +144,6 @@ def get_git_commits(commits):
 
     results.save_to_disk(git_commits)
     results.save_to_disk(git_trac_links)
-    
 
     return git_commits, git_trac_links, tickets
 
