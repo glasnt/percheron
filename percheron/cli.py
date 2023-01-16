@@ -1,8 +1,9 @@
-import rich_click as click
 import rich
+import rich_click as click
 from rich import print
-from percheron.utils import git, reports, trac, github, nlp, results
+
 from percheron import config
+from percheron.utils import git, github, nlp, reports, results, trac
 
 
 def header(str):

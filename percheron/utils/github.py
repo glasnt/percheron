@@ -1,10 +1,11 @@
 import time
-
 from datetime import datetime
+
 from tqdm import tqdm
+
+from percheron import config
 from percheron.utils import cache, results
 from percheron.utils.helpers import unique
-from percheron import config
 
 
 def github_api(uri):

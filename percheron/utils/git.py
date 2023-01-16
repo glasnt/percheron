@@ -1,13 +1,15 @@
 import re
 import subprocess
 import sys
-from rich import print
 from datetime import datetime
 from pathlib import Path
-from percheron.utils.helpers import unique
-from percheron.utils import results
-from percheron import config
+
 import git
+from rich import print
+
+from percheron import config
+from percheron.utils import results
+from percheron.utils.helpers import unique
 
 
 def run_command(cmd):

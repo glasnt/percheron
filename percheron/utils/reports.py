@@ -8,8 +8,8 @@ from rich import print
 from rich.console import Console
 from rich.table import Table
 
-from percheron.utils.helpers import unique
 from percheron import config
+from percheron.utils.helpers import unique
 
 OUTPUT_REPORT = Path(config.REPORT_FOLDER) / "percheron_report.txt"
 OUTPUT_LIST = Path(config.REPORT_FOLDER) / "percheron_list.txt"

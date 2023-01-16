@@ -1,10 +1,11 @@
 
-from sqlite_utils import Database
 import json
 from pathlib import Path
 
-from percheron.utils.helpers import retrieve_name
+from sqlite_utils import Database
+
 from percheron import config
+from percheron.utils.helpers import retrieve_name
 
 OUTPUT_DB = Path(config.DATA_FOLDER) / "percheron_data.db"
 

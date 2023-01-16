@@ -1,10 +1,12 @@
-from nltk import ne_chunk, pos_tag, word_tokenize
-import nltk
-from tqdm import tqdm
-from nltk.tree import Tree
 import re
-from percheron.utils.helpers import flatten, unique
+
+import nltk
+from nltk import ne_chunk, pos_tag, word_tokenize
+from nltk.tree import Tree
+from tqdm import tqdm
+
 from percheron.utils import results
+from percheron.utils.helpers import flatten, unique
 
 
 def get_people(text):

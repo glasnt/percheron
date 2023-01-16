@@ -1,5 +1,4 @@
 from requests_cache import CachedSession
-
 from rich import print
 
 

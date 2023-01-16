@@ -1,7 +1,9 @@
 import json
+
 from tqdm import tqdm
-from percheron.utils import cache, results
+
 from percheron import config
+from percheron.utils import cache, results
 
 
 def get_trac_details(ticket_no):
