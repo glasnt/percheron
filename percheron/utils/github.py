@@ -174,10 +174,12 @@ def get_github_user(user):
     try:
         data = github_api(f"/users/{user}")
     except ValueError:
-        return user + " [not found on GitHub]"
+        # this is okay
+        return user
     if data["name"] == None:
-        return user + " [no GitHub name]"
-    return data["name"]
+        # This is ok
+        return user
+    return data["name"].strip()
 
 
 def get_github_users(users):

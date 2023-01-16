@@ -131,9 +131,19 @@ def generate_report(
         console.print(table)
         console.rule(f"Report Generated {datetime.now().ctime()}")
 
-    django_contributors = unique(
-        [github_name.get(g, g) for g in unique(contributors.keys())]
-    )
+
+    # Generate a displayable name for the list report
+    django_contributors = []
+    for c in unique(contributors.keys()):
+        name = github_name.get(c, None)
+        if name is not None and name != c:
+            display_name = f"{name} ({c})"
+        else:
+            display_name = c
+        django_contributors.append(display_name)
+    
+    django_contributors = unique(django_contributors)
+
     with open(OUTPUT_LIST, "w") as f:
         f.write(f"Contributors to Django {version}: {len(django_contributors)}")
         f.write("\n".join(django_contributors))
