@@ -1,6 +1,6 @@
 # percheron
 
-<table><tr><td width="30%">
+<table height="250px"><tr><td width="30%">
 <img alt="percheron logo" src="docs/percheron_logo.png">
 </td><td>
 
