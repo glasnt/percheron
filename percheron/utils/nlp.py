@@ -5,25 +5,25 @@ from nltk.tree import Tree
 import re
 from percheron.utils.helpers import flatten, unique
 
-def get_people(text): 
+
+def get_people(text):
     """For a string of text, return people."""
     people = []
     nltk_results = ne_chunk(pos_tag(word_tokenize(text)))
     for nltk_result in nltk_results:
         if type(nltk_result) == Tree:
-            name = ''
+            name = ""
             for nltk_result_leaf in nltk_result.leaves():
-                name += nltk_result_leaf[0] + ' '
+                name += nltk_result_leaf[0] + " "
             if nltk_result.label() == "PERSON":
                 people.append(name.strip())
     return people
 
 
 def get_thanks(commits):
-    """Search all commit messages for people manually thanked. 
+    """Search all commit messages for people manually thanked.
     Often associated with security fixes, as these are processed by Fellows with attributing the people who
     notified them about the issue."""
-
 
     print("Processing all commit messages...")
 
@@ -33,12 +33,12 @@ def get_thanks(commits):
     security_thanks = []
     second_pass = []
 
-    for msg in thanks_messages: 
+    for msg in thanks_messages:
         thanks = re.findall("Thanks (.*) for", msg)
         if not thanks:
             second_pass.append(msg)
             continue
-        # Some messages contain multiple people, so split them out. 
+        # Some messages contain multiple people, so split them out.
         for thank in thanks:
             thank = thank.replace("to ", "")
             if "," in thank:
@@ -53,11 +53,10 @@ def get_thanks(commits):
     # inline cleanup
     for i, thank in enumerate(security_thanks):
         security_thanks[i] = thank.split("for")[0]
-        
+
     for i, thank in enumerate(security_thanks):
         security_thanks[i] = thank.split("and")[0]
-        
-        
+
     # remove duplicates
     security_thanks = unique(security_thanks)
     complex_thanks = []
@@ -69,15 +68,28 @@ def get_thanks(commits):
             complex_thanks.append(person)
         else:
             people.append(person)
-            
+
     for thank in complex_thanks:
         people += get_people(thank)
-    
-    
+
     # Remove word set
-    word_set = ["Fixed", "Changed", "Django", "Matches", "Redis", "Catalan", "Exact", 
-                "Ref", "Sphinx", "Splunk", "Moved", "Month", "Python", "Switched"]
-        
+    word_set = [
+        "Fixed",
+        "Changed",
+        "Django",
+        "Matches",
+        "Redis",
+        "Catalan",
+        "Exact",
+        "Ref",
+        "Sphinx",
+        "Splunk",
+        "Moved",
+        "Month",
+        "Python",
+        "Switched",
+    ]
+
     people = unique(people)
     for i, person in enumerate(people):
         # Trim out word set
@@ -85,13 +97,15 @@ def get_thanks(commits):
         if person in word_set:
             people.pop(i)
 
-    #TODO(glasnt): results come back with an empty string. 
+    # TODO(glasnt): results come back with an empty string.
 
     return people
 
 
-def install_nltk_data(): 
+def install_nltk_data():
 
     print("Downloading NLTK data packages...")
-    for package in tqdm(["punkt", "averaged_perceptron_tagger", "maxent_ne_chunker", "words" ]):
+    for package in tqdm(
+        ["punkt", "averaged_perceptron_tagger", "maxent_ne_chunker", "words"]
+    ):
         nltk.download(package, quiet=True)

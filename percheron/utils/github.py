@@ -123,22 +123,24 @@ def get_github_data(tickets):
 
     return pull_requests, pr_comments
 
-def rate_limit_context(): 
+
+def rate_limit_context():
     GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", None)
     """For a GitHub API path, return the JSON data"""
 
     session = cache.session()
 
     with session.cache_disabled():
-        resp = session.get("https://api.github.com/rate_limit",
-                headers={
-                    "Authorization": f"Bearer {GITHUB_TOKEN}",
-                    "Accept": "application/vnd.github.v3.raw",
-                }
-            )
+        resp = session.get(
+            "https://api.github.com/rate_limit",
+            headers={
+                "Authorization": f"Bearer {GITHUB_TOKEN}",
+                "Accept": "application/vnd.github.v3.raw",
+            },
+        )
     if "message" in resp.json().keys():
         print(resp.json())
-    else: 
+    else:
         data = resp.json()["resources"]
         now = datetime.now()
 
@@ -150,17 +152,18 @@ def rate_limit_context():
             wait_minutes = int(wait_seconds / 60)
             message += f"\nRate limit expired. Wait {wait_minutes} minutes (or {wait_seconds} seconds)."
 
-        for limit_type in ["core", "search"]: 
+        for limit_type in ["core", "search"]:
             d = data[limit_type]
             reset = datetime.fromtimestamp(d["reset"])
-            print(f"GitHub {limit_type} API limit: {d['used']}/{d['limit']} resets at {reset} ({reset.second} seconds)")
-
+            print(
+                f"GitHub {limit_type} API limit: {d['used']}/{d['limit']} resets at {reset} ({reset.second} seconds)"
+            )
 
 
 def get_github_user(user):
     """For a GitHub username, get their name.
-    NOTE(glasnt): debugging details have been added here to work out source of 
-    missing data, rather than trying to use None or N/A, etc. 
+    NOTE(glasnt): debugging details have been added here to work out source of
+    missing data, rather than trying to use None or N/A, etc.
     """
     try:
         data = github_api(f"/users/{user}")
@@ -170,12 +173,12 @@ def get_github_user(user):
         return user + " [no GitHub name]"
     return data["name"]
 
+
 def get_github_users(users):
     """For a list of users, get their GitHub name"""
     github_name = {}
     for user in tqdm(unique(users)):
         github_name[user] = get_github_user(user)
-    
+
     # Also return the reverse dict
     return github_name
-

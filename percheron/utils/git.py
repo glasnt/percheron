@@ -11,7 +11,7 @@ CACHE_FOLDER = "cache/"
 DJANGO_PROJECT = "django"
 TRANSLATIONS_PROJECT = "django-docs-translations"
 DJANGO_REPO = Path(CACHE_FOLDER) / DJANGO_PROJECT
-TRANSLATIONS_REPO =  Path(CACHE_FOLDER) / TRANSLATIONS_PROJECT
+TRANSLATIONS_REPO = Path(CACHE_FOLDER) / TRANSLATIONS_PROJECT
 
 
 def run_command(cmd):
@@ -21,25 +21,29 @@ def run_command(cmd):
         sys.stdout.buffer.write(c)
 
 
-def get_django_repo(): 
+def get_django_repo():
     get_github_repo(codebase=DJANGO_PROJECT, clone_fn=DJANGO_REPO)
 
 
-def get_translations_repo(version): 
-    get_github_repo(codebase=TRANSLATIONS_PROJECT, clone_fn=TRANSLATIONS_REPO, branch=f"stable/{version}.x")
+def get_translations_repo(version):
+    get_github_repo(
+        codebase=TRANSLATIONS_PROJECT,
+        clone_fn=TRANSLATIONS_REPO,
+        branch=f"stable/{version}.x",
+    )
 
 
-def get_github_repo(codebase, clone_fn,  branch=None):
+def get_github_repo(codebase, clone_fn, branch=None):
     """Pull a copy of the git repo to local disk, if it doesn't already exist.
     Optionally only clone a specific branch in question (saves time/diskspace)"""
 
     if Path(clone_fn).exists():
-        print(
-            f"Codebase already cloned. To re-clone, delete the folder '{clone_fn}'."
-        )
+        print(f"Codebase already cloned. To re-clone, delete the folder '{clone_fn}'.")
     else:
         branch_filter = f"-b {branch}" if branch else ""
-        run_command(f"git clone {branch_filter} https://github.com/django/{codebase} {str(clone_fn)}")
+        run_command(
+            f"git clone {branch_filter} https://github.com/django/{codebase} {str(clone_fn)}"
+        )
 
 
 def get_previous_version(version):
@@ -97,7 +101,9 @@ def get_commits_in_range(start_tag, end_tag):
     print("Last commit:")
     pretty_commit(end_commit)
     print(f"Number of commits: {len(commits)}")
-    commit_delta = datetime.fromtimestamp(end_commit.authored_date) - datetime.fromtimestamp(start_commit.authored_date)
+    commit_delta = datetime.fromtimestamp(
+        end_commit.authored_date
+    ) - datetime.fromtimestamp(start_commit.authored_date)
     print(
         f"Time between commits: {commit_delta.days} days ({str(round(commit_delta.days / 7 / 52 * 12))} months)"
     )
@@ -141,11 +147,10 @@ def get_git_commits(commits):
     return git_commits, git_trac_links, tickets
 
 
-
-def get_translators(version): 
+def get_translators(version):
     """Get translators for version of Django
-    
-    NOTE: the logic within here is based on the limitation that we 
+
+    NOTE: the logic within here is based on the limitation that we
     parse the translation file headers for committers for the current year
 
     If functionality within Transifex is found, this can be used instead.
@@ -160,14 +165,14 @@ def get_translators(version):
     translators = []
 
     for file in translations.glob("**/*.po"):
-        with open(file) as f: 
+        with open(file) as f:
             for line in f.readlines():
                 if re.search(f"^#(.*){year}", line):
                     translators.append(line.split(",")[0])
 
     # cleanup data
     for i, author in enumerate(translators):
-        translators[i] = author.replace("#","").strip().split("<")[0]
-                    
+        translators[i] = author.replace("#", "").strip().split("<")[0]
+
     translators = unique(translators)
     return translators

@@ -1,4 +1,3 @@
-
 import json
 from tqdm import tqdm
 from percheron.utils import cache
@@ -6,13 +5,14 @@ from percheron.utils import cache
 
 DJANGO_TRAC = "https://code.djangoproject.com/jsonrpc"
 
+
 def get_trac_details(ticket_no):
     """For a ticket number, get the ticket information and changes from Trac"""
-    
+
     session = cache.session()
     ticket_comments = []
-    
-    # Shout out to rixx https://gist.github.com/rixx/422392d2aa580b5d286e585418bf6915 
+
+    # Shout out to rixx https://gist.github.com/rixx/422392d2aa580b5d286e585418bf6915
     resp = session.post(
         DJANGO_TRAC,
         data=json.dumps(
@@ -22,7 +22,7 @@ def get_trac_details(ticket_no):
     )
 
     data = resp.json()["result"][3]
-    
+
     ticket = {
         "ticket_id": ticket_no,
         "status": data["status"],
@@ -41,13 +41,13 @@ def get_trac_details(ticket_no):
         ),
         headers={"Content-Type": "application/json"},
     )
-    
+
     changes = response.json()["result"]
 
     for change in changes:
         name = change[1]
         if name:
-            name = name.split("<")[0].strip() # remove emails,
+            name = name.split("<")[0].strip()  # remove emails,
         ticket_comments.append(
             {
                 "ticket_id": ticket_no,
@@ -66,7 +66,7 @@ def get_trac_tickets(tickets):
     trac_tickets = []
     trac_ticket_comments = []
 
-    for ticket_no in tqdm(tickets): 
+    for ticket_no in tqdm(tickets):
         ticket, ticket_comments = get_trac_details(ticket_no)
         trac_tickets.append(ticket)
         trac_ticket_comments += ticket_comments

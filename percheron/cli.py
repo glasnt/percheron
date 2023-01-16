@@ -3,7 +3,8 @@ import rich
 from rich import print
 from percheron.utils import git, trac, github, nlp, config, results, helpers
 
-def header(str): 
+
+def header(str):
     """Print a formatted header"""
     print(rich.rule.Rule())
     print(f"[bold]{str}[/bold]")
@@ -16,9 +17,7 @@ def cli():
 
 
 @cli.command(name="get")
-@click.argument(
-    "version"
-)
+@click.argument("version")
 @click.option(
     "-o",
     "--option",
@@ -29,7 +28,9 @@ def get(version, option):
 
     issue = config.validate_configuration()
     if issue:
-        print(f"[red]An issue has occured:\n  [bold]{issue}[/bold]\nCannot continue.[/red]")
+        print(
+            f"[red]An issue has occured:\n  [bold]{issue}[/bold]\nCannot continue.[/red]"
+        )
         click.Context.exit(1)
 
     print(rich.markdown.Markdown(f"# percheron processing Django {version}"))
@@ -40,9 +41,11 @@ def get(version, option):
     header(":thought_balloon: Determine range of calculations")
     prev_version = git.get_previous_version(version)
     if not git.tag_valid(prev_version):
-        print(f"❌ Previous version [bold]{prev_version}[/bold] isn't a valid tag. Exiting.")
+        print(
+            f"❌ Previous version [bold]{prev_version}[/bold] isn't a valid tag. Exiting."
+        )
         click.Context.exit(1)
-    
+
     print(f"Searching for Django contributors between {prev_version} and {version}")
     commits = git.get_commits_in_range(start_tag=prev_version, end_tag=version)
 
@@ -73,17 +76,46 @@ def get(version, option):
     print("Translators:", len(translators))
 
     header(f":name_badge: Get all github users")
-    github_name = github.get_github_users([u["user"] for u in pull_requests] + [u["user"] for u in pr_comments] + [u["reporter"] for u in trac_tickets ] +[u["name"] for u in trac_ticket_comments])
+    github_name = github.get_github_users(
+        [u["user"] for u in pull_requests]
+        + [u["user"] for u in pr_comments]
+        + [u["reporter"] for u in trac_tickets]
+        + [u["name"] for u in trac_ticket_comments]
+    )
     github_user = {v: k for k, v in github_name.items()}
-    #github_user, github_data = helpers.convert_lookup_to_data(github_name)
+    # github_user, github_data = helpers.convert_lookup_to_data(github_name)
     print("Users:", len(github_name))
 
     header(f":bar_chart: Generate report")
-    results.generate_report(version, git_commits, pull_requests, pr_comments, trac_tickets, trac_ticket_comments, thanks, translators, github_user, github_name)
+    results.generate_report(
+        version,
+        git_commits,
+        pull_requests,
+        pr_comments,
+        trac_tickets,
+        trac_ticket_comments,
+        thanks,
+        translators,
+        github_user,
+        github_name,
+    )
 
     header(f":floppy_disk: Saving data to disk")
-    all_data = [git_commits, git_trac_links, trac_tickets, trac_ticket_comments, pull_requests, pr_comments, thanks, translators]#, github_data]
-    
+    all_data = [
+        git_commits,
+        git_trac_links,
+        trac_tickets,
+        trac_ticket_comments,
+        pull_requests,
+        pr_comments,
+        thanks,
+        translators,
+    ]  # , github_data]
+
     results.save_to_disk(all_data)
 
-    print(rich.markdown.Markdown(f"# Data collected.\n\nYou can now start analysing the data with Datasette: \n\n```datasette {results.OUTPUT_DB}```"))
+    print(
+        rich.markdown.Markdown(
+            f"# Data collected.\n\nYou can now start analysing the data with Datasette: \n\n```datasette {results.OUTPUT_DB}```"
+        )
+    )
