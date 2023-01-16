@@ -13,13 +13,6 @@ def datasette_init():
     Path(config.DATA_FOLDER).mkdir(parents=True, exist_ok=True)
     Database(OUTPUT_DB, recreate=True)
 
-def load_from_json(data_fn):
-    """Load data from file"""
-    json_fn = f"{config.DATA_FOLDER}/{data_fn}.json"
-    with open(json_fn) as f:
-        data = json.load(f)
-    return data
-
 
 def save_to_disk(data):
     """For a list of dictionaries, save the results to a JSON file, and append to datasette"""

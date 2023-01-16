@@ -1,4 +1,5 @@
 import csv
+import json
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
@@ -27,6 +28,14 @@ def print_table(
     for x in data:
         table.add_row(*list([str(y) for y in x]))
     print(table)
+
+
+def load_from_json(data_fn):
+    """Load data from file"""
+    json_fn = f"{config.DATA_FOLDER}/{data_fn}.json"
+    with open(json_fn) as f:
+        data = json.load(f)
+    return data
 
 
 def table_data(data_source):
