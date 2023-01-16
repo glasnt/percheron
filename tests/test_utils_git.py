@@ -1,11 +1,16 @@
 from percheron.utils import git
+import pytest
 
-def test_version_parse(): 
+@pytest.fixture
+def django_git(): 
+    git.get_django_repo()
+
+def test_version_parse(django_git): 
     assert git.get_previous_version("4.1") == "4.0"
     assert git.get_previous_version("4.0") == "3.2"
     assert git.get_previous_version("3.0") == "2.2"
     
-def test_tag_valid(): 
+def test_tag_valid(django_git): 
     assert git.tag_valid("4.1")
     assert git.tag_valid("4.0")
 

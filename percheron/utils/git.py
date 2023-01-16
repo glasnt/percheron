@@ -122,7 +122,7 @@ def get_git_commits(commits):
 
         # Get all ticket references in message
         # NOTE(glasnt): this will include "Fixed", but also "Refs" (which may include older tickets)
-        tickets = [x.replace("#", "") for x in re.findall("\#[0-9]*", commit.message)]
+        tickets = [x.replace("#", "") for x in re.findall("#[0-9]*", commit.message)]
 
         for ticket in tickets:
             if ticket:
