@@ -50,3 +50,7 @@ Now install the dependencies and test dependencies:
 To run the tests:
 
     pytest
+
+## Notes
+
+Project logo based on generated DALL-E image. 
