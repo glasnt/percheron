@@ -74,4 +74,5 @@ The following is the relational mapping, some fields removed for clarity.
 
 * Translation authors are only publicly visible in the header information of the translation `.po` files ([example](https://github.com/django/django-docs-translations/commit/ce809e91c8d8ade2de7982aa0014e9d1e77c1aa9)). New information in these headers are only added for the calendar year, which may not map to a Django release. 
 * Trac uses GitHub logins, but also supports Django Project logins. There's no public API to map non-GitHub logins to names, and often only the names, not usernames, are rendered in the page output. 
-* Mapping git commit author names to the names associated to GitHub users may not always be 100% complete. 
+
+See also any [open issues against the repo](https://github.com/glasnt/percheron/issues).
