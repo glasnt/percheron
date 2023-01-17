@@ -1,7 +1,7 @@
 from setuptools import setup
 from textwrap import dedent
 
-VERSION = "0.0.3"
+VERSION = "0.0.4"
 
 
 def get_long_description():
